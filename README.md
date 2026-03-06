@@ -1,90 +1,109 @@
-`<html>
-<body>
-<!--StartFragment--><h1 class="text-text-100 mt-3 -mb-1 text-[1.375rem] font-bold">CRT Modernized Edition — Release Notes</h1>
-<h3 class="text-text-100 mt-2 -mb-1 text-base font-bold">v1.1 — Public Fork of CrowdStrike Reporting Tool for Azure/M365</h3>
-<hr class="border-border-200 border-t-0.5 my-3 mx-1.5">
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">Overview</h2>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]">This is a community-maintained, modernized fork of the <a class="underline underline underline-offset-2 decoration-1 decoration-current/40 hover:decoration-current focus:decoration-current" href="https://github.com/CrowdStrike/CRT">CrowdStrike Reporting Tool for Azure/M365 (CRT)</a>, originally authored by CrowdStrike Endpoint Recovery Services. The original tool relied on the <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">AzureAD</code> and <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">MSOnline</code> PowerShell modules, both of which Microsoft has deprecated and removed. This release replaces those dependencies entirely with the <strong>Microsoft Graph SDK</strong> and <strong>Microsoft Graph REST API</strong>, restoring full functionality and extending the tool with new reports, risk classification, and a browser-based dashboard.</p>
-<blockquote class="ml-2 border-l-4 border-border-300/10 pl-4 text-text-300">
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]"><strong>License:</strong> This fork retains the original CrowdStrike MIT license. See the license header in the script for full terms.</p>
-</blockquote>
-<hr class="border-border-200 border-t-0.5 my-3 mx-1.5">
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">What's New in v1.1</h2>
-<h3 class="text-text-100 mt-2 -mb-1 text-base font-bold">Core Modernization</h3>
-<ul class="[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3">
-<li class="whitespace-normal break-words pl-2"><strong>AzureAD module fully replaced</strong> with <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Microsoft.Graph</code> SDK (<code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Connect-MgGraph</code>). All Graph calls use the v1.0 endpoint with automatic pagination via <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">@odata.nextLink</code>.</li>
-<li class="whitespace-normal break-words pl-2"><strong>MSOnline module fully replaced</strong> with Microsoft Graph REST API equivalents.</li>
-<li class="whitespace-normal break-words pl-2"><strong>ExchangeOnlineManagement v3+</strong> retained and required. All Exchange cmdlets use the modern <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Get-EXO*</code> variants (<code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Get-EXOMailbox</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Get-EXOCASMailbox</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Get-EXOMailboxPermission</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Get-EXORecipientPermission</code>) which are significantly faster than their legacy counterparts for large tenants.</li>
-<li class="whitespace-normal break-words pl-2"><strong>Single authentication session</strong> — one <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Connect-MgGraph</code> call and one <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Connect-ExchangeOnline</code> call at startup with all required scopes declared up front, replacing the scattered, per-report auth calls in the original.</li>
-<li class="whitespace-normal break-words pl-2"><strong>App-only (unattended) authentication</strong> added via <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">-TenantId</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">-AppId</code>, and <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">-CertificateThumbprint</code> parameters, enabling scheduled/automated runs without interactive sign-in.</li>
-<li class="whitespace-normal break-words pl-2"><strong>Full transcript logging</strong> — all console output, warnings, and errors are captured to <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">CRTTranscript.txt</code> in the output folder. A structured <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">CRTRun.log</code> is also written with per-report timing and completion status.</li>
-<li class="whitespace-normal break-words pl-2"><strong>Resilient execution</strong> — individual report failures no longer abort the run. Failed reports are logged and skipped; all other reports continue to completion.</li>
-</ul>
-<h3 class="text-text-100 mt-2 -mb-1 text-base font-bold">New Reports</h3>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]">Two reports have been added that did not exist in the original CRT:</p>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]"><strong><code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">MailboxRules</code></strong> — Audits inbox rules across all user mailboxes in the tenant.</p>
-<ul class="[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3">
-<li class="whitespace-normal break-words pl-2">Classifies each rule's action tFype: <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">ExternalForward</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">ExternalRedirect</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">ExternalForwardAsAttach</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Forward</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Redirect</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Delete</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Move</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Copy</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">MarkRead</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Multiple</code>, or <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Other</code>.</li>
-<li class="whitespace-normal break-words pl-2">Detects external vs. internal forward/redirect targets by comparing against all verified tenant domains.</li>
-<li class="whitespace-normal break-words pl-2">Flags rules whose conditions match security-related keywords (<code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">password</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">MFA</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">reset</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">security alert</code>, <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">Microsoft</code>, etc.) — a common attacker technique for suppressing authentication and breach notifications.</li>
-<li class="whitespace-normal break-words pl-2">Risk levels: <strong>HIGH</strong> (external forward/redirect, delete), <strong>MEDIUM</strong> (internal forward, security keyword conditions), <strong>LOW</strong> (passive rules).</li>
-</ul>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]"><strong><code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">EnterpriseApps</code></strong> — Audits all service principals (Enterprise Applications) registered in the tenant.</p>
-<ul class="[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3">
-<li class="whitespace-normal break-words pl-2">Surfaces publisher verification status, multi-tenant vs. single-tenant classification, credential inventory (secrets and certificates with expiry status), and permission summary.</li>
-<li class="whitespace-normal break-words pl-2">Cross-references delegated OAuth2 grants and application role assignments to produce a per-app permission risk tier.</li>
-<li class="whitespace-normal break-words pl-2">Risk levels: <strong>CRITICAL</strong> (tenant-takeover-capable permissions), <strong>HIGH</strong> (broad mail/file/user write permissions or multi-tenant unverified with credentials), <strong>MEDIUM</strong> (sensitive read-only permissions or expired credentials), <strong>LOW</strong>, <strong>INFO</strong> (no permissions).</li>
-<li class="whitespace-normal break-words pl-2">Excludes Microsoft first-party service principals by default to reduce noise and focus on third-party and custom apps.</li>
-</ul>
-<h3 class="text-text-100 mt-2 -mb-1 text-base font-bold">Enhanced Existing Reports</h3>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]">All original reports are preserved with the following enhancements:</p>
-<div class="overflow-x-auto w-full px-2 mb-6">
-Report | Enhancement
--- | --
-O365AdminGroups | Role sensitivity tiers (CRITICAL / HIGH / MEDIUM) added. Member-level risk flags for guest accounts, service principals, and accounts with no UPN assigned to admin roles.
-DelegateAppPerms | Permission risk tiers (CRITICAL / HIGH / MEDIUM / LOW) added for both delegated and application permission types. Distinguishes admin-consented (AllPrincipals) from user-consented (Principal) grants.
-SMTPForward | External vs. internal forwarding detection against verified tenant domains. Risk classification (HIGH / MEDIUM / LOW) with flags for missing DeliverToMailboxAndForward on internal forwards.
-TransportRules | Action type classification (ExternalForward, ExternalBCC, Delete, ModifyHeader, etc.). Flags disabled rules with dangerous actions as potentially staged. Detects SCL=-1 spam filter bypass.
-KeyCredentials | Expiry tracking for both key credentials (certificates) and password credentials (client secrets) on all app registrations and service principals. IsExpired and DaysUntilExpiry fields added.
-All reports | Structured investigative tips written to the summary file with finding counts, risk breakdowns, and analyst guidance for each report section.
 
-</div>
-<hr class="border-border-200 border-t-0.5 my-3 mx-1.5">
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">Available Report Names (for <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">-Commands</code>)</h2>
-<div class="relative group/copy bg-bg-000/50 border-0.5 border-border-400 rounded-lg"><div class="sticky opacity-0 group-hover/copy:opacity-100 top-2 py-2 h-12 w-0 float-right"><div class="absolute right-0 h-8 px-2 items-center inline-flex z-10"><button class="inline-flex
-  items-center
-  justify-center
-  relative
-  shrink-0
-  can-focus
-  select-none
-  disabled:pointer-events-none
-  disabled:opacity-50
-  disabled:shadow-none
-  disabled:drop-shadow-none border-transparent
-          transition
-          font-base
-          duration-300
-          ease-[cubic-bezier(0.165,0.85,0.45,1)] h-8 w-8 rounded-md active:scale-95 backdrop-blur-md Button_ghost__BUAoh" type="button" aria-label="Copy to clipboard" data-state="closed"><div class="relative"><div class="transition-all opacity-100 scale-100" style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="transition-all opacity-100 scale-100" aria-hidden="true" style="flex-shrink: 0;"><path d="M12.5 3C13.3284 3 14 3.67157 14 4.5V6H15.5C16.3284 6 17 6.67157 17 7.5V15.5C17 16.3284 16.3284 17 15.5 17H7.5C6.67157 17 6 16.3284 6 15.5V14H4.5C3.67157 14 3 13.3284 3 12.5V4.5C3 3.67157 3.67157 3 4.5 3H12.5ZM14 12.5C14 13.3284 13.3284 14 12.5 14H7V15.5C7 15.7761 7.22386 16 7.5 16H15.5C15.7761 16 16 15.7761 16 15.5V7.5C16 7.22386 15.7761 7 15.5 7H14V12.5ZM4.5 4C4.22386 4 4 4.22386 4 4.5V12.5C4 12.7761 4.22386 13 4.5 13H12.5C12.7761 13 13 12.7761 13 12.5V4.5C13 4.22386 12.7761 4 12.5 4H4.5Z"></path></svg></div><div class="absolute inset-0 flex items-center justify-center"><div class="transition-all opacity-0 scale-50" style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="transition-all opacity-0 scale-50" aria-hidden="true" style="flex-shrink: 0;"><path d="M15.1883 5.10908C15.3699 4.96398 15.6346 4.96153 15.8202 5.11592C16.0056 5.27067 16.0504 5.53125 15.9403 5.73605L15.8836 5.82003L8.38354 14.8202C8.29361 14.9279 8.16242 14.9925 8.02221 14.9989C7.88203 15.0051 7.74545 14.9526 7.64622 14.8534L4.14617 11.3533L4.08172 11.2752C3.95384 11.0811 3.97542 10.817 4.14617 10.6463C4.31693 10.4755 4.58105 10.4539 4.77509 10.5818L4.85321 10.6463L7.96556 13.7586L15.1161 5.1794L15.1883 5.10908Z"></path></svg></div></div></div></button></div></div><div class="overflow-x-auto"><pre class="code-block__code !my-0 !rounded-lg !text-sm !leading-relaxed p-3.5" style="color: rgb(20, 24, 31); background: transparent; font-family: var(--font-mono);"><code style="color: rgb(20, 24, 31); background: transparent; font-family: var(--font-mono); white-space: pre-wrap;"><span><span>FedConfig           FedTrust            ClientAccess        RemoteDomains
-</span></span><span>SMTPForward         TransportRules      FullAccessGranted   AnyAccessGranted
-</span><span>SendAsGranted       EXOPowerShell       AuditBypassEnabled  HiddenMailboxes
-</span><span>KeyCredentials      O365AdminGroups     DelegateAppPerms    AdminAuditLogConfig
-</span><span>MailboxRules        EnterpriseApps      SignInSummary       SignInFlagged</span></code></pre></div></div>
-<hr class="border-border-200 border-t-0.5 my-3 mx-1.5">
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">Known Limitations</h2>
-<ul class="[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3">
-<li class="whitespace-normal break-words pl-2"><strong>Partner/GDAP delegated admin information</strong> is no longer retrievable via PowerShell. Manual review steps are documented in the <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">PartnerInfo_MANUAL.txt</code> output file.</li>
-<li class="whitespace-normal break-words pl-2"><strong>Mailbox rule creation dates</strong> are not exposed by Exchange Online. <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">DateLastModified</code> is included where available but may be null for rules that have never been edited.</li>
-<li class="whitespace-normal break-words pl-2"><strong><code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">MailboxRules</code> and <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">FullAccessGranted</code></strong> are resource-intensive in large tenants as they enumerate every mailbox individually. Plan for extended run times in environments with thousands of mailboxes.</li>
-<li class="whitespace-normal break-words pl-2"><strong>PIM (Privileged Identity Management) eligible roles</strong> are surfaced on a best-effort basis depending on tenant license level. The <code class="bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]">O365AdminGroups</code> report reflects currently <em>active</em> role assignments.</li>
-<li class="whitespace-normal break-words pl-2"><strong>Federation configuration detail</strong> varies depending on tenant license level.</li>
+<body>
+
+<h1>CRT Modernized Edition — Release Notes</h1>
+<h3>v1.1 — Public Fork of CrowdStrike Reporting Tool for Azure/M365</h3>
+<hr>
+
+<h2>Overview</h2>
+<p>This is a community-maintained, modernized fork of the <a href="https://github.com/CrowdStrike/CRT">CrowdStrike Reporting Tool for Azure/M365 (CRT)</a>, originally authored by CrowdStrike Endpoint Recovery Services. The original tool relied on the <code>AzureAD</code> and <code>MSOnline</code> PowerShell modules, both of which Microsoft has deprecated and removed. This release replaces those dependencies entirely with the <strong>Microsoft Graph SDK</strong> and <strong>Microsoft Graph REST API</strong>, restoring full functionality and extending the tool with new reports, risk classification, and a browser-based dashboard.</p>
+<blockquote>
+<p><strong>License:</strong> This fork retains the original CrowdStrike MIT license. See the license header in the script for full terms.</p>
+</blockquote>
+<hr>
+
+<h2>What's New in v1.1</h2>
+<h3>Core Modernization</h3>
+<ul>
+<li><strong>AzureAD module fully replaced</strong> with <code>Microsoft.Graph</code> SDK (<code>Connect-MgGraph</code>). All Graph calls use the v1.0 endpoint with automatic pagination via <code>@odata.nextLink</code>.</li>
+<li><strong>MSOnline module fully replaced</strong> with Microsoft Graph REST API equivalents.</li>
+<li><strong>ExchangeOnlineManagement v3+</strong> retained and required. All Exchange cmdlets use the modern <code>Get-EXO*</code> variants (<code>Get-EXOMailbox</code>, <code>Get-EXOCASMailbox</code>, <code>Get-EXOMailboxPermission</code>, <code>Get-EXORecipientPermission</code>) which are significantly faster than their legacy counterparts for large tenants.</li>
+<li><strong>Single authentication session</strong> — one <code>Connect-MgGraph</code> call and one <code>Connect-ExchangeOnline</code> call at startup with all required scopes declared up front, replacing the scattered, per-report auth calls in the original.</li>
+<li><strong>App-only (unattended) authentication</strong> added via <code>-TenantId</code>, <code>-AppId</code>, and <code>-CertificateThumbprint</code> parameters, enabling scheduled/automated runs without interactive sign-in.</li>
+<li><strong>Full transcript logging</strong> — all console output, warnings, and errors are captured to <code>CRTTranscript.txt</code> in the output folder. A structured <code>CRTRun.log</code> is also written with per-report timing and completion status.</li>
+<li><strong>Resilient execution</strong> — individual report failures no longer abort the run. Failed reports are logged and skipped; all other reports continue to completion.</li>
 </ul>
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">New: Report Dashboard and Technician Runbook</h2>
-<ul class="[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3">
-<li class="whitespace-normal break-words pl-2"><strong>CRT-Dashboard-V2.html</strong> is a self-contained web page that loads the JSON output files and renders them as filterable, color-coded tables. No internet connection or server is required — open it directly in a browser.</li>
-<li class="whitespace-normal break-words pl-2"><strong>CRT-Technician-Runbook-V2.docx</strong> is a technician guide to using and interpreting the reports in this tool. </li>
+
+<h3>New Reports</h3>
+<p>Four reports have been added that did not exist in the original CRT:</p>
+
+<p><strong><code>MailboxRules</code></strong> — Audits inbox rules across all user mailboxes in the tenant.</p>
+<ul>
+<li>Classifies each rule's action type: <code>ExternalForward</code>, <code>ExternalRedirect</code>, <code>ExternalForwardAsAttach</code>, <code>Forward</code>, <code>Redirect</code>, <code>Delete</code>, <code>Move</code>, <code>Copy</code>, <code>MarkRead</code>, <code>Multiple</code>, or <code>Other</code>.</li>
+<li>Detects external vs. internal forward/redirect targets by comparing against all verified tenant domains.</li>
+<li>Flags rules whose conditions match security-related keywords (<code>password</code>, <code>MFA</code>, <code>reset</code>, <code>security alert</code>, <code>Microsoft</code>, etc.) — a common attacker technique for suppressing authentication and breach notifications.</li>
+<li>Risk levels: <strong>HIGH</strong> (external forward/redirect, delete), <strong>MEDIUM</strong> (internal forward, security keyword conditions), <strong>LOW</strong> (passive rules).</li>
 </ul>
-<hr class="border-border-200 border-t-0.5 my-3 mx-1.5">
-<h2 class="text-text-100 mt-3 -mb-1 text-[1.125rem] font-bold">Acknowledgements</h2>
-<p class="font-claude-response-body break-words whitespace-normal leading-[1.7]">Original tool written by <strong>CrowdStrike Endpoint Recovery Services</strong>. This fork modernizes the tooling for continued use following Microsoft's deprecation of the AzureAD and MSOnline PowerShell modules. All credit for the original report design and investigative methodology belongs to the CrowdStrike CRT team.</p><!--EndFragment-->
+
+<p><strong><code>EnterpriseApps</code></strong> — Audits all service principals (Enterprise Applications) registered in the tenant.</p>
+<ul>
+<li>Surfaces publisher verification status, multi-tenant vs. single-tenant classification, credential inventory (secrets and certificates with expiry status), and permission summary.</li>
+<li>Cross-references delegated OAuth2 grants and application role assignments to produce a per-app permission risk tier.</li>
+<li>Risk levels: <strong>CRITICAL</strong> (tenant-takeover-capable permissions), <strong>HIGH</strong> (broad mail/file/user write permissions or multi-tenant unverified with credentials), <strong>MEDIUM</strong> (sensitive read-only permissions or expired credentials), <strong>LOW</strong>, <strong>INFO</strong> (no permissions).</li>
+<li>Excludes Microsoft first-party service principals by default to reduce noise and focus on third-party and custom apps.</li>
+</ul>
+
+<p><strong><code>SignInSummary</code></strong> — Per-user summary of sign-in activity over the past 30 days (configurable via parameter).</p>
+<ul>
+<li>Aggregates risk signals per user: foreign countries accessed from, legacy authentication usage, MFA-skipped count, impossible travel detections, and password spray indicators.</li>
+<li>Surfaces privileged accounts (via <code>PrivilegedRole</code> column) for elevated scrutiny — foreign logins or legacy auth on admin accounts warrant immediate review.</li>
+<li>Intended as the starting point for sign-in investigation. Foreign logins and legacy auth are common in legitimate environments (VPNs, travel, service accounts); the goal is to identify accounts where the pattern cannot be explained by normal business activity.</li>
+<li>Accounts with both impossible travel and a successful sign-in are the highest priority. Multiple unrelated foreign countries within the same period is more notable than a single country.</li>
+<li>Risk level: <strong>HIGH</strong>.</li>
+</ul>
+
+<p><strong><code>SignInFlagged</code></strong> — Individual sign-in events classified as MEDIUM, HIGH, or CRITICAL. Produced alongside <code>SignInSummary</code> as a drill-down companion file.</p>
+<ul>
+<li>Captures specific events with one or more risk signals: foreign location, legacy auth protocol, MFA not satisfied, Identity Protection elevated risk, impossible travel, or a success-after-failures pattern.</li>
+<li>Intended for use after identifying accounts of interest in <code>SignInSummary</code> — filter by <code>UserPrincipalName</code> to see all flagged events for a specific account.</li>
+<li>Each event includes <code>IPAddress</code>, <code>Country</code>, <code>ResourceDisplayName</code>, MFA status, and <code>ErrorCode</code>. Error code <code>0</code> indicates success; non-zero values are failed attempts.</li>
+<li>A CRITICAL row (foreign successful sign-in on a privileged account) should be investigated by confirming the sign-in with the account owner directly.</li>
+<li>Risk level: <strong>HIGH</strong>.</li>
+</ul>
+
+<h3>Enhanced Existing Reports</h3>
+<p>All original reports are preserved with the following enhancements:</p>
+<table>
+<thead>
+<tr><th>Report</th><th>Enhancement</th></tr>
+</thead>
+<tbody>
+<tr><td>O365AdminGroups</td><td>Role sensitivity tiers (CRITICAL / HIGH / MEDIUM) added. Member-level risk flags for guest accounts, service principals, and accounts with no UPN assigned to admin roles.</td></tr>
+<tr><td>DelegateAppPerms</td><td>Permission risk tiers (CRITICAL / HIGH / MEDIUM / LOW) added for both delegated and application permission types. Distinguishes admin-consented (AllPrincipals) from user-consented (Principal) grants.</td></tr>
+<tr><td>SMTPForward</td><td>External vs. internal forwarding detection against verified tenant domains. Risk classification (HIGH / MEDIUM / LOW) with flags for missing DeliverToMailboxAndForward on internal forwards.</td></tr>
+<tr><td>TransportRules</td><td>Action type classification (ExternalForward, ExternalBCC, Delete, ModifyHeader, etc.). Flags disabled rules with dangerous actions as potentially staged. Detects SCL=-1 spam filter bypass.</td></tr>
+<tr><td>KeyCredentials</td><td>Expiry tracking for both key credentials (certificates) and password credentials (client secrets) on all app registrations and service principals. IsExpired and DaysUntilExpiry fields added.</td></tr>
+<tr><td>All reports</td><td>Structured investigative tips written to the summary file with finding counts, risk breakdowns, and analyst guidance for each report section.</td></tr>
+</tbody>
+</table>
+<hr>
+
+<h2>Available Report Names (for <code>-Commands</code>)</h2>
+<pre><code>FedConfig           FedTrust            ClientAccess        RemoteDomains
+SMTPForward         TransportRules      FullAccessGranted   AnyAccessGranted
+SendAsGranted       EXOPowerShell       AuditBypassEnabled  HiddenMailboxes
+KeyCredentials      O365AdminGroups     DelegateAppPerms    AdminAuditLogConfig
+MailboxRules        EnterpriseApps      SignInSummary       SignInFlagged</code></pre>
+<hr>
+
+<h2>Known Limitations</h2>
+<ul>
+<li><strong>Partner/GDAP delegated admin information</strong> is no longer retrievable via PowerShell. Manual review steps are documented in the <code>PartnerInfo_MANUAL.txt</code> output file.</li>
+<li><strong>Mailbox rule creation dates</strong> are not exposed by Exchange Online. <code>DateLastModified</code> is included where available but may be null for rules that have never been edited.</li>
+<li><strong><code>MailboxRules</code> and <code>FullAccessGranted</code></strong> are resource-intensive in large tenants as they enumerate every mailbox individually. Plan for extended run times in environments with thousands of mailboxes.</li>
+<li><strong>PIM (Privileged Identity Management) eligible roles</strong> are surfaced on a best-effort basis depending on tenant license level. The <code>O365AdminGroups</code> report reflects currently <em>active</em> role assignments.</li>
+<li><strong>Federation configuration detail</strong> varies depending on tenant license level.</li>
+</ul>
+
+<h2>New: Report Dashboard and Technician Runbook</h2>
+<ul>
+<li><strong>CRT-Dashboard-V2.html</strong> is a self-contained web page that loads the JSON output files and renders them as filterable, color-coded tables. No internet connection or server is required — open it directly in a browser.</li>
+<li><strong>CRT-Technician-Runbook-V2.docx</strong> is a technician guide to using and interpreting the reports in this tool.</li>
+</ul>
+<hr>
+
+<h2>Acknowledgements</h2>
+<p>Original tool written by <strong>CrowdStrike Endpoint Recovery Services</strong>. This fork modernizes the tooling for continued use following Microsoft's deprecation of the AzureAD and MSOnline PowerShell modules. All credit for the original report design and investigative methodology belongs to the CrowdStrike CRT team.</p>
+
 </body>
+</html>
